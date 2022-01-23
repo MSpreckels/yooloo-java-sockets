@@ -9,9 +9,9 @@ import net.mspreckels.client.config.ClientConfig;
 import net.mspreckels.client.state.ClientState;
 import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
-import net.mspreckels.message.ClientMessage;
-import net.mspreckels.message.ClientMessageType;
-import net.mspreckels.message.ServerMessage;
+import net.mspreckels.client.message.ClientMessage;
+import net.mspreckels.client.message.ClientMessageType;
+import net.mspreckels.server.message.ServerMessage;
 import net.mspreckels.enums.AppState;
 
 public class Client {

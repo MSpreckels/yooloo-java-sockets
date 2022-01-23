@@ -1,7 +1,6 @@
-package net.mspreckels.message;
+package net.mspreckels.client.message;
 
 import java.io.Serializable;
-import net.mspreckels.client.Client;
 
 public class ClientMessage implements Serializable {
   private String description;

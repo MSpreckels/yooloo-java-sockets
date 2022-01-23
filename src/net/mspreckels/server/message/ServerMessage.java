@@ -1,4 +1,4 @@
-package net.mspreckels.message;
+package net.mspreckels.server.message;
 
 import java.io.Serializable;
 

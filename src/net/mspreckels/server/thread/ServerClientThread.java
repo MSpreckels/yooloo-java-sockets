@@ -7,9 +7,9 @@ import java.net.Socket;
 import net.mspreckels.enums.AppState;
 import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
-import net.mspreckels.message.ClientMessage;
-import net.mspreckels.message.ServerMessage;
-import net.mspreckels.message.ServerMessageType;
+import net.mspreckels.client.message.ClientMessage;
+import net.mspreckels.server.message.ServerMessage;
+import net.mspreckels.server.message.ServerMessageType;
 
 public class ServerClientThread extends Thread {
 
