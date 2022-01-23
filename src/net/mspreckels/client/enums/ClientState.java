@@ -1,4 +1,4 @@
-package net.mspreckels.client.state;
+package net.mspreckels.client.enums;
 
 public enum ClientState {
   REGISTER,

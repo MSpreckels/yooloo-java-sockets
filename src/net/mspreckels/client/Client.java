@@ -6,7 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import net.mspreckels.client.config.ClientConfig;
-import net.mspreckels.client.state.ClientState;
+import net.mspreckels.client.enums.ClientState;
 import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
 import net.mspreckels.client.message.ClientMessage;

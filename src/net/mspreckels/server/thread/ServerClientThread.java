@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.UUID;
 import net.mspreckels.enums.AppState;
 import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
@@ -15,36 +16,44 @@ public class ServerClientThread extends Thread {
 
   private static final Logger LOG = new Logger(ServerClientThread.class);
 
-  private ObjectOutputStream objectOutputStream;
-  private ObjectInputStream objectInputStream;
+  private final ObjectOutputStream objectOutputStream;
+  private final ObjectInputStream objectInputStream;
+
+  private final Socket client;
+  private final UUID uuid;
 
   public ServerClientThread(Socket client) throws IOException, ClassNotFoundException {
+
+    this.client = client;
+    this.uuid = UUID.randomUUID();
 
     objectOutputStream = new ObjectOutputStream(client.getOutputStream());
     objectInputStream = new ObjectInputStream(client.getInputStream());
     objectOutputStream.flush();
 
-    LOG.log(Level.INFO, "Sending print command to %s", client.getRemoteSocketAddress());
+    LOG.log(Level.INFO, "(%s) Sending print command to %s", uuid, client.getRemoteSocketAddress());
     ServerMessage message = new ServerMessage();
     message.setDescription("Testing.");
     message.setType(ServerMessageType.PRINT);
-    message.setPayload("Hello from Server");
+    message.setPayload(String.format("Hello from Serverthread with uuid %s", uuid));
     objectOutputStream.writeObject(message);
 
     //wait for response
     ClientMessage response = readInputStream(ClientMessage.class);
-    LOG.log(Level.INFO, "Client response: %s %s", response.getType(), response.getPayload());
+    LOG.log(Level.INFO, "(%s) Client response: %s %s", uuid, response.getType(), response.getPayload());
+  }
 
-    LOG.log(Level.INFO, "Sending shutdown command to %s", client.getRemoteSocketAddress());
-    message = new ServerMessage();
+  public void shutdown() throws IOException, ClassNotFoundException {
+    LOG.log(Level.INFO, "(%s) Sending shutdown command to %s", uuid, client.getRemoteSocketAddress());
+    ServerMessage message = new ServerMessage();
     message.setDescription("Shutting down .");
     message.setType(ServerMessageType.CHANGE_APPSTATE);
     message.setPayload(AppState.SHUTDOWN);
     objectOutputStream.writeObject(message);
 
     //wait for response
-    response = readInputStream(ClientMessage.class);
-    LOG.log(Level.INFO, "Client response: %s %s", response.getType(), response.getPayload());
+    ClientMessage response = readInputStream(ClientMessage.class);
+    LOG.log(Level.INFO, "(%s) Client response: %s %s", uuid, response.getType(), response.getPayload());
 
   }
 

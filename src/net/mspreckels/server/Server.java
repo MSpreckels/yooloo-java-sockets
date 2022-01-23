@@ -3,11 +3,13 @@ package net.mspreckels.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import net.mspreckels.enums.AppState;
 import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
 import net.mspreckels.server.config.ServerConfig;
-import net.mspreckels.server.state.ServerState;
+import net.mspreckels.server.enums.ServerState;
 import net.mspreckels.server.thread.ServerClientThread;
 
 public class Server {
@@ -20,12 +22,14 @@ public class Server {
   private ServerState serverState;
 
   private ServerSocket serverSocket;
+  private List<ServerClientThread> serverClientThreadList;
 
   public Server(String[] args, ServerConfig config) {
     this.args = args;
     serverSocket = null;
     appState = AppState.STARTUP;
     this.config = config;
+    serverClientThreadList = new ArrayList<>();
   }
 
   /**
@@ -37,6 +41,7 @@ public class Server {
     switch (this.appState) {
       case STARTUP -> handleStartup();
       case ACCEPTING -> handleAccepting();
+      case SESSION -> handleSession();
       case SHUTDOWN -> handleShutdown();
     }
   }
@@ -55,6 +60,10 @@ public class Server {
     Socket incomingClient = this.serverSocket.accept();
 
     handleClient(incomingClient);
+
+    if (serverClientThreadList.size() > 1) {
+      changeState(AppState.SESSION);
+    }
   }
 
   private void handleClient(Socket incomingClient)
@@ -64,6 +73,16 @@ public class Server {
 
     ServerClientThread serverClientThread = new ServerClientThread(incomingClient);
     serverClientThread.start();
+
+    this.serverClientThreadList.add(serverClientThread);
+  }
+
+  private void handleSession() throws IOException, ClassNotFoundException {
+    for (ServerClientThread thread : serverClientThreadList) {
+      thread.shutdown();
+    }
+    serverClientThreadList.clear();
+    changeState(AppState.ACCEPTING);
   }
 
   private void handleShutdown() {
