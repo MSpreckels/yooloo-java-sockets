@@ -10,6 +10,7 @@ import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
 import net.mspreckels.server.config.ServerConfig;
 import net.mspreckels.server.enums.ServerState;
+import net.mspreckels.server.session.Session;
 import net.mspreckels.server.thread.ServerClientThread;
 
 public class Server {
@@ -78,9 +79,8 @@ public class Server {
   }
 
   private void handleSession() throws IOException, ClassNotFoundException {
-    for (ServerClientThread thread : serverClientThreadList) {
-      thread.shutdown();
-    }
+    Session session = new Session(serverClientThreadList);
+    session.start();
     serverClientThreadList.clear();
     changeState(AppState.ACCEPTING);
   }

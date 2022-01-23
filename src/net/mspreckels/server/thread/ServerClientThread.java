@@ -43,6 +43,20 @@ public class ServerClientThread extends Thread {
     LOG.log(Level.INFO, "(%s) Client response: %s %s", uuid, response.getType(), response.getPayload());
   }
 
+  public void poke() throws IOException, ClassNotFoundException {
+    LOG.log(Level.INFO, "(%s) Sending poke command to %s", uuid, client.getRemoteSocketAddress());
+    ServerMessage message = new ServerMessage();
+    message.setDescription("Shutting down .");
+    message.setType(ServerMessageType.PRINT);
+    message.setPayload("Poke");
+    objectOutputStream.writeObject(message);
+
+    //wait for response
+    ClientMessage response = readInputStream(ClientMessage.class);
+    LOG.log(Level.INFO, "(%s) Client response: %s", uuid, response.getType());
+
+  }
+
   public void shutdown() throws IOException, ClassNotFoundException {
     LOG.log(Level.INFO, "(%s) Sending shutdown command to %s", uuid, client.getRemoteSocketAddress());
     ServerMessage message = new ServerMessage();
