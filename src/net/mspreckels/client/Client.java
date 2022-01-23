@@ -5,16 +5,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.mspreckels.client.config.ClientConfig;
 import net.mspreckels.client.state.ClientState;
+import net.mspreckels.logger.Logger;
+import net.mspreckels.logger.Logger.Level;
+import net.mspreckels.message.ClientMessage;
+import net.mspreckels.message.ClientMessageType;
 import net.mspreckels.message.ServerMessage;
 import net.mspreckels.enums.AppState;
 
 public class Client {
 
-  private static Logger LOG = Logger.getLogger("CLIENT_LOGGER");
+//  private static Logger LOG = Logger.getLogger("CLIENT_LOGGER");
+  private static Logger LOG = new Logger(Client.class);
 
   private final String[] args;
   private final long retryMilliseconds = 5000;
@@ -44,7 +47,7 @@ public class Client {
   }
 
   private void handleStartup() {
-    LOG.log(Level.INFO, "Client started.");
+    LOG.log(Level.SUCCESS, "Client started.");
 
     changeState(AppState.CONNECTING);
   }
@@ -56,9 +59,12 @@ public class Client {
       this.objectInputStream = new ObjectInputStream(socket.getInputStream());
       this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
 
+      LOG.log(Level.SUCCESS, String.format("Connection successful! Connected to %s",
+        this.socket.getRemoteSocketAddress()));
+
       changeState(AppState.CONNECTED);
     } catch (ConnectException e) {
-      LOG.log(Level.INFO,
+      LOG.log(Level.WARNING,
         String.format("Connection couldn't be established. Retry in %s second.",
           (retryMilliseconds / 1000)));
       Thread.sleep(retryMilliseconds);
@@ -66,9 +72,6 @@ public class Client {
   }
 
   private void handleConnected() throws IOException, ClassNotFoundException {
-    LOG.log(Level.INFO, String.format("Connection successful! Connected to %s",
-      this.socket.getRemoteSocketAddress()));
-
     switch (clientState) {
       case REGISTER -> {
       }
@@ -88,19 +91,31 @@ public class Client {
 //        changeState(AppState.BEFORE_SHUTDOWN);
   }
 
-  private void handleServerMessage(ServerMessage message) {
+  private void handleServerMessage(ServerMessage message) throws IOException {
     switch (message.getType()) {
       case CHANGE_APPSTATE -> {
+        sendResponse(ClientMessageType.CONFIRM, "Shutting down!");
         changeState((AppState) message.getPayload());
       }
       case PRINT -> {
-        System.out.println((String) message.getPayload());
+        LOG.log(Level.INFO, "Server sent: %s", message.getPayload());
+        sendResponse(ClientMessageType.OK, "Done!");
+
       }
     }
   }
 
+  private void sendResponse(ClientMessageType type, Object payload) throws IOException {
+    ClientMessage message = new ClientMessage();
+    message.setDescription("Response");
+    message.setType(type);
+    message.setPayload(payload);
+
+    objectOutputStream.writeObject(message);
+  }
+
   private void handleShutdown() {
-    LOG.log(Level.INFO, "Client shutting down. Goodbye!");
+    LOG.log(Level.WARNING, "Client shutting down. Goodbye!");
     changeState(AppState.CLOSE);
   }
 

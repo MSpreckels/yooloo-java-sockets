@@ -1,21 +1,18 @@
 package net.mspreckels.server;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.mspreckels.enums.AppState;
-import net.mspreckels.message.ServerMessage;
-import net.mspreckels.message.ServerMessageType;
+import net.mspreckels.logger.Logger;
+import net.mspreckels.logger.Logger.Level;
 import net.mspreckels.server.config.ServerConfig;
 import net.mspreckels.server.state.ServerState;
 import net.mspreckels.server.thread.ServerClientThread;
 
 public class Server {
 
-  private static Logger LOG = Logger.getLogger("SERVER_LOGGER");
+  private static final Logger LOG = new Logger(Server.class);
 
   private final String[] args;
   private final ServerConfig config;
@@ -33,9 +30,10 @@ public class Server {
 
   /**
    * main server method, runs in a loop
+   *
    * @throws IOException
    */
-  public void run() throws IOException, InterruptedException {
+  public void run() throws IOException, InterruptedException, ClassNotFoundException {
     switch (this.appState) {
       case STARTUP -> handleStartup();
       case ACCEPTING -> handleAccepting();
@@ -44,7 +42,7 @@ public class Server {
   }
 
   private void handleStartup() throws IOException {
-    LOG.log(Level.INFO, "Server started.");
+    LOG.log(Level.SUCCESS, "Server started.");
 
     //Setup server socket
     this.serverSocket = new ServerSocket(config.getPort());
@@ -52,15 +50,17 @@ public class Server {
     changeState(AppState.ACCEPTING);
   }
 
-  private void handleAccepting() throws IOException, InterruptedException {
+  private void handleAccepting() throws IOException, InterruptedException, ClassNotFoundException {
     LOG.log(Level.INFO, "Waiting for connections...");
     Socket incomingClient = this.serverSocket.accept();
 
     handleClient(incomingClient);
   }
 
-  private void handleClient(Socket incomingClient) throws IOException, InterruptedException {
-    LOG.log(Level.INFO, String.format("Client %s has been connected.", incomingClient.getRemoteSocketAddress()));
+  private void handleClient(Socket incomingClient)
+    throws IOException, InterruptedException, ClassNotFoundException {
+    LOG.log(Level.INFO,
+      String.format("Client %s has been connected.", incomingClient.getRemoteSocketAddress()));
 
     ServerClientThread serverClientThread = new ServerClientThread(incomingClient);
     serverClientThread.start();

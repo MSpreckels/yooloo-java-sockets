@@ -14,7 +14,7 @@ public class Main {
         while(!server.getAppState().equals(AppState.CLOSE)) {
             try {
                 server.run();
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException | InterruptedException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
