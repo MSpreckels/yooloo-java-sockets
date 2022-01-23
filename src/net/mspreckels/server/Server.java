@@ -10,7 +10,7 @@ import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
 import net.mspreckels.server.config.ServerConfig;
 import net.mspreckels.server.enums.ServerState;
-import net.mspreckels.server.session.Session;
+import net.mspreckels.server.thread.Session;
 import net.mspreckels.server.thread.ServerClientThread;
 
 public class Server {

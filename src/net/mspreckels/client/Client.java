@@ -5,6 +5,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import net.mspreckels.client.config.ClientConfig;
 import net.mspreckels.client.enums.ClientState;
 import net.mspreckels.logger.Logger;
@@ -96,6 +99,14 @@ public class Client {
       case CHANGE_APPSTATE -> {
         sendResponse(ClientMessageType.CONFIRM, "Shutting down!");
         changeState((AppState) message.getPayload());
+      }
+      case GET_CARDS -> {
+        int[] ints = IntStream.range(0, 10).toArray();
+        LOG.log(Level.INFO, "Sending cards (%s) to server", Arrays.stream(ints)
+          .mapToObj(String::valueOf)
+          .collect(Collectors.joining(" ")));
+
+        sendResponse(ClientMessageType.OK, ints);
       }
       case PRINT -> {
         LOG.log(Level.INFO, "Server sent: %s", message.getPayload());

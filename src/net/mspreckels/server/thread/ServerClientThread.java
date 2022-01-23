@@ -46,7 +46,7 @@ public class ServerClientThread extends Thread {
   public void poke() throws IOException, ClassNotFoundException {
     LOG.log(Level.INFO, "(%s) Sending poke command to %s", uuid, client.getRemoteSocketAddress());
     ServerMessage message = new ServerMessage();
-    message.setDescription("Shutting down .");
+    message.setDescription("Pokeing client");
     message.setType(ServerMessageType.PRINT);
     message.setPayload("Poke");
     objectOutputStream.writeObject(message);
@@ -73,5 +73,22 @@ public class ServerClientThread extends Thread {
 
   private <T> T readInputStream(Class<T> clazz) throws IOException, ClassNotFoundException {
     return (T) this.objectInputStream.readObject();
+  }
+
+  public int[] getCards() throws IOException, ClassNotFoundException {
+    LOG.log(Level.INFO, "(%s) Asking client for their card selection", uuid);
+    ServerMessage message = new ServerMessage();
+    message.setDescription("Fetching cards");
+    message.setType(ServerMessageType.GET_CARDS);
+    objectOutputStream.writeObject(message);
+
+    ClientMessage response = readInputStream(ClientMessage.class);
+    LOG.log(Level.INFO, "(%s) Client response: %s %s", uuid, response.getType(), response.getPayload());
+
+    return (int[]) response.getPayload();
+  }
+
+  public UUID getUUID() {
+    return uuid;
   }
 }
