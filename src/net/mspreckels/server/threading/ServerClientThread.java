@@ -1,9 +1,10 @@
-package net.mspreckels.server.thread;
+package net.mspreckels.server.threading;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 import java.util.UUID;
 import net.mspreckels.enums.AppState;
 import net.mspreckels.logger.Logger;
@@ -43,20 +44,6 @@ public class ServerClientThread extends Thread {
     LOG.log(Level.INFO, "(%s) Client response: %s %s", uuid, response.getType(), response.getPayload());
   }
 
-  public void poke() throws IOException, ClassNotFoundException {
-    LOG.log(Level.INFO, "(%s) Sending poke command to %s", uuid, client.getRemoteSocketAddress());
-    ServerMessage message = new ServerMessage();
-    message.setDescription("Pokeing client");
-    message.setType(ServerMessageType.PRINT);
-    message.setPayload("Poke");
-    objectOutputStream.writeObject(message);
-
-    //wait for response
-    ClientMessage response = readInputStream(ClientMessage.class);
-    LOG.log(Level.INFO, "(%s) Client response: %s", uuid, response.getType());
-
-  }
-
   public void shutdown() throws IOException, ClassNotFoundException {
     LOG.log(Level.INFO, "(%s) Sending shutdown command to %s", uuid, client.getRemoteSocketAddress());
     ServerMessage message = new ServerMessage();
@@ -75,7 +62,7 @@ public class ServerClientThread extends Thread {
     return (T) this.objectInputStream.readObject();
   }
 
-  public int[] getCards() throws IOException, ClassNotFoundException {
+  public List<Integer> getCards() throws IOException, ClassNotFoundException {
     LOG.log(Level.INFO, "(%s) Asking client for their card selection", uuid);
     ServerMessage message = new ServerMessage();
     message.setDescription("Fetching cards");
@@ -85,10 +72,23 @@ public class ServerClientThread extends Thread {
     ClientMessage response = readInputStream(ClientMessage.class);
     LOG.log(Level.INFO, "(%s) Client response: %s %s", uuid, response.getType(), response.getPayload());
 
-    return (int[]) response.getPayload();
+    return (List<Integer>) response.getPayload();
   }
 
   public UUID getUUID() {
     return uuid;
+  }
+
+  public void sendMessage(String s) throws IOException, ClassNotFoundException {
+    LOG.log(Level.INFO, "(%s) Sending message %s", uuid, s);
+    ServerMessage message = new ServerMessage();
+    message.setDescription("Message");
+    message.setType(ServerMessageType.PRINT);
+    message.setPayload(s);
+    objectOutputStream.writeObject(message);
+
+    ClientMessage response = readInputStream(ClientMessage.class);
+    LOG.log(Level.INFO, "(%s) Client response: %s", uuid, response.getType(), response.getPayload());
+
   }
 }

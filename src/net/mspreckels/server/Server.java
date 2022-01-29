@@ -10,8 +10,8 @@ import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
 import net.mspreckels.server.config.ServerConfig;
 import net.mspreckels.server.enums.ServerState;
-import net.mspreckels.server.thread.Session;
-import net.mspreckels.server.thread.ServerClientThread;
+import net.mspreckels.server.threading.Session;
+import net.mspreckels.server.threading.ServerClientThread;
 
 public class Server {
 
@@ -25,12 +25,24 @@ public class Server {
   private ServerSocket serverSocket;
   private List<ServerClientThread> serverClientThreadList;
 
+  private int numSessionsCreated=0;
+
   public Server(String[] args, ServerConfig config) {
     this.args = args;
     serverSocket = null;
     appState = AppState.STARTUP;
     this.config = config;
     serverClientThreadList = new ArrayList<>();
+  }
+
+  public void start() {
+    while(!appState.equals(AppState.CLOSE)) {
+      try {
+        run();
+      } catch (IOException | InterruptedException | ClassNotFoundException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   /**
@@ -79,7 +91,9 @@ public class Server {
   }
 
   private void handleSession() throws IOException, ClassNotFoundException {
-    Session session = new Session(serverClientThreadList);
+    LOG.log(Level.INFO, "Enough clients connected! Creating session...");
+
+    Session session = new Session(numSessionsCreated++, serverClientThreadList);
     session.start();
     serverClientThreadList.clear();
     changeState(AppState.ACCEPTING);
@@ -98,4 +112,6 @@ public class Server {
   public AppState getAppState() {
     return this.appState;
   }
+
+
 }

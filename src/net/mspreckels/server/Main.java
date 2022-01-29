@@ -9,13 +9,6 @@ public class Main {
     public static void main(String[] args) {
         ServerConfig config = new ServerConfig();
         Server server = new Server(args, config);
-
-        while(!server.getAppState().equals(AppState.CLOSE)) {
-            try {
-                server.run();
-            } catch (IOException | InterruptedException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+        server.start();
     }
 }

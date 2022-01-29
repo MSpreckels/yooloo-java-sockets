@@ -40,7 +40,7 @@ public class Logger {
     this.scope = clazz.getSimpleName();
   }
 
-  public void log(Level level, String message) {
+  private void log(Level level, String message) {
     Color color = getColorForLevel(level);
     System.out.printf("%s [%s] %s:%s %s\n", color, scope, level, Color.RESET, message);
   }

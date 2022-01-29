@@ -5,7 +5,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.mspreckels.client.config.ClientConfig;
@@ -32,12 +35,24 @@ public class Client {
   private Socket socket;
   private ObjectInputStream objectInputStream;
   private ObjectOutputStream objectOutputStream;
+  private List<Integer> cards;
 
   public Client(String[] args, ClientConfig config) {
     this.args = args;
     this.config = config;
     this.appState = AppState.STARTUP;
     this.clientState = ClientState.WAITING;
+    this.cards = new ArrayList<>();
+  }
+
+  public void start() {
+    while (!appState.equals(AppState.CLOSE)) {
+      try {
+        run();
+      } catch (IOException | InterruptedException | ClassNotFoundException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   public void run() throws IOException, InterruptedException, ClassNotFoundException {
@@ -51,6 +66,9 @@ public class Client {
 
   private void handleStartup() {
     LOG.log(Level.SUCCESS, "Client started.");
+
+    cards = IntStream.range(1, 11).boxed().collect(Collectors.toList());
+    Collections.shuffle(cards);
 
     changeState(AppState.CONNECTING);
   }
@@ -91,22 +109,20 @@ public class Client {
       case QUIT -> {
       }
     }
-//        changeState(AppState.BEFORE_SHUTDOWN);
   }
 
   private void handleServerMessage(ServerMessage message) throws IOException {
     switch (message.getType()) {
       case CHANGE_APPSTATE -> {
-        sendResponse(ClientMessageType.CONFIRM, "Shutting down!");
+        sendResponse(ClientMessageType.OK, "Shutting down!");
         changeState((AppState) message.getPayload());
       }
       case GET_CARDS -> {
-        int[] ints = IntStream.range(0, 10).toArray();
-        LOG.log(Level.INFO, "Sending cards (%s) to server", Arrays.stream(ints)
-          .mapToObj(String::valueOf)
+        LOG.log(Level.INFO, "Sending cards (%s) to server", cards.stream()
+          .map(String::valueOf)
           .collect(Collectors.joining(" ")));
 
-        sendResponse(ClientMessageType.OK, ints);
+        sendResponse(ClientMessageType.OK, cards);
       }
       case PRINT -> {
         LOG.log(Level.INFO, "Server sent: %s", message.getPayload());
@@ -142,4 +158,6 @@ public class Client {
   public AppState getAppState() {
     return this.appState;
   }
+
+
 }
