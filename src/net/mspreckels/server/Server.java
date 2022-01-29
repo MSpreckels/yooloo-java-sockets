@@ -74,7 +74,7 @@ public class Server {
 
     handleClient(incomingClient);
 
-    if (serverClientThreadList.size() > 1) {
+    if (serverClientThreadList.size() == config.getMaxPlayersInSession()) {
       changeState(AppState.SESSION);
     }
   }
