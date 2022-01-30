@@ -35,20 +35,10 @@ public class YoolooGame {
       for (UUID client : session.getClientUUIDs()) {
         Integer cardOfClient = session.getCardOfClient(client, i);
         currentCards.add(cardOfClient);
-
-        this.session.sendMessageTo(client, "Played Round " + (i + 1));
       }
+      this.session.broadcast("Played Round " + (i + 1));
 
-      int[] cardsCounter = new int[10];
-      currentCards.forEach(integer -> cardsCounter[integer - 1]++);
-
-      int bestCard = 0;
-      for (int j = cardsCounter.length - 1; j >= 0; j--) {
-        if (cardsCounter[j] == 1) {
-          bestCard = j + 1;
-          break;
-        }
-      }
+      int bestCard = getBestCard(currentCards);
 
       UUID roundWinner = session.getClientByCard(bestCard, i);
 
@@ -63,10 +53,31 @@ public class YoolooGame {
 
     }
 
+    UUID gameWinner = getWinnerOfGame();
+
+    this.session.broadcast(String.format("Winner of game is %s with %s points!", gameWinner, points.get(gameWinner)));
+
+  }
+
+  private UUID getWinnerOfGame() {
     Entry<UUID, Integer> winnerEntry = points.entrySet().stream()
       .sorted((uuidIntegerEntry, uuidIntegerEntry2) ->
         uuidIntegerEntry.getValue() > uuidIntegerEntry2.getValue() ? -1 : 0).iterator().next();
-    this.session.broadcast("Winner of game is " + winnerEntry.getKey());
 
+    return winnerEntry.getKey();
+  }
+
+  private int getBestCard(List<Integer> currentCards) {
+    int bestCard = 0;
+    int[] cardsCounter = new int[10];
+    currentCards.forEach(integer -> cardsCounter[integer - 1]++);
+
+    for (int j = cardsCounter.length - 1; j >= 0; j--) {
+      if (cardsCounter[j] == 1) {
+        bestCard = j + 1;
+        break;
+      }
+    }
+    return bestCard;
   }
 }

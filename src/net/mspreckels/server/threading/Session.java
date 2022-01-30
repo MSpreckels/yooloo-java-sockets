@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,13 +16,13 @@ public class Session extends Thread {
 
   private static final Logger LOG = new Logger(Session.class);
 
-  private final ArrayList<ServerClientThread> clients;
+  private final ArrayList<ServerClientThread> clientThreads;
   private final int sessonId;
   private HashMap<UUID, List<Integer>> clientCards;
 
   public Session(int id, List<ServerClientThread> threads) {
     this.sessonId = id;
-    this.clients = new ArrayList<>(threads);
+    this.clientThreads = new ArrayList<>(threads);
   }
 
   @Override
@@ -32,17 +31,17 @@ public class Session extends Thread {
     //get cards from clients
     try {
       clientCards = getCardsFromClients();
-
-      clientCards.forEach(
-        (uuid, cards) -> LOG.log(Level.INFO, "(%s) Player %s has chosen %s.", sessonId, uuid,
-          cards.stream()
-            .map(String::valueOf)
-            .collect(Collectors.joining(" "))));
     } catch (IOException e) {
       e.printStackTrace();
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
+
+    clientCards.forEach(
+      (uuid, cards) -> LOG.log(Level.INFO, "(%s) Player %s has chosen %s.", sessonId, uuid,
+        cards.stream()
+          .map(String::valueOf)
+          .collect(Collectors.joining(" "))));
 
     broadcast("Starting yooloo game!");
 
@@ -50,9 +49,9 @@ public class Session extends Thread {
     yoolooGame.play();
 
     //shutdown clients
-    clients.forEach(serverClientThread -> {
+    clientThreads.forEach(clientThread -> {
       try {
-        serverClientThread.shutdown();
+        clientThread.shutdown();
       } catch (IOException e) {
         e.printStackTrace();
       } catch (ClassNotFoundException e) {
@@ -66,7 +65,7 @@ public class Session extends Thread {
     throws IOException, ClassNotFoundException {
     HashMap<UUID, List<Integer>> cardSelection = new HashMap<>();
 
-    for (ServerClientThread client : clients) {
+    for (ServerClientThread client : clientThreads) {
       List<Integer> cards = client.getCards();
 
       cardSelection.put(client.getUUID(), cards);
@@ -80,9 +79,11 @@ public class Session extends Thread {
   }
 
   public void sendMessageTo(UUID client, String s) {
-    ServerClientThread clientThread = clients.stream()
+    ServerClientThread clientThread = clientThreads.stream()
       .filter(serverClientThread -> serverClientThread.getUUID().equals(client))
       .findFirst().orElseThrow();
+
+    LOG.log(Level.INFO, "(%s) Sending message %s", client, s);
 
     try {
       clientThread.sendMessage(s);
@@ -94,7 +95,9 @@ public class Session extends Thread {
   }
 
   public void broadcast(String s) {
-    clients.forEach(serverClientThread -> {
+    LOG.log(Level.INFO, "(%s) Broadcasting message to all participants: '%s'", sessonId, s);
+
+    clientThreads.forEach(serverClientThread -> {
       try {
         serverClientThread.sendMessage(s);
       } catch (IOException e) {

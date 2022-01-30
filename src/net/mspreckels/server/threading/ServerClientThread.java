@@ -35,8 +35,8 @@ public class ServerClientThread extends Thread {
     LOG.log(Level.INFO, "(%s) Sending print command to %s", uuid, client.getRemoteSocketAddress());
     ServerMessage message = new ServerMessage();
     message.setDescription("Testing.");
-    message.setType(ServerMessageType.PRINT);
-    message.setPayload(String.format("Hello from Serverthread with uuid %s", uuid));
+    message.setType(ServerMessageType.IDENTITY);
+    message.setPayload(uuid);
     objectOutputStream.writeObject(message);
 
     //wait for response
@@ -79,7 +79,6 @@ public class ServerClientThread extends Thread {
   }
 
   public void sendMessage(String s) throws IOException, ClassNotFoundException {
-    LOG.log(Level.INFO, "(%s) Sending message %s", uuid, s);
     ServerMessage message = new ServerMessage();
     message.setDescription("Message");
     message.setType(ServerMessageType.PRINT);
@@ -87,7 +86,7 @@ public class ServerClientThread extends Thread {
     objectOutputStream.writeObject(message);
 
     ClientMessage response = readInputStream(ClientMessage.class);
-    LOG.log(Level.INFO, "(%s) Client response: %s", uuid, response.getType(), response.getPayload());
+//    LOG.log(Level.INFO, "(%s) Client response: %s", uuid, response.getType(), response.getPayload());
 
   }
 }

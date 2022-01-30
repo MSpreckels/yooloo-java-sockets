@@ -8,5 +8,13 @@ public class Main {
     ClientConfig config = new ClientConfig();
     Client client = new Client(args, config);
     client.start();
+
+    while(true) {
+      try {
+        Thread.sleep(0);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
   }
 }

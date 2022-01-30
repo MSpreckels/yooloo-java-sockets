@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.mspreckels.client.config.ClientConfig;
@@ -32,6 +33,7 @@ public class Client {
   private ObjectInputStream objectInputStream;
   private ObjectOutputStream objectOutputStream;
   private List<Integer> cards;
+  private UUID uuid;
 
   public Client(String[] args, ClientConfig config) {
     this.args = args;
@@ -100,6 +102,14 @@ public class Client {
         sendResponse(ClientMessageType.OK, "Shutting down!");
         changeState(ClientState.SHUTDOWN);
       }
+      case IDENTITY -> {
+        this.uuid = (UUID) message.getPayload();
+
+        LOG.log(Level.INFO, "Your identification is %s", uuid);
+
+        sendResponse(ClientMessageType.OK, "Done!");
+
+      }
       case GET_CARDS -> {
         LOG.log(Level.INFO, "Sending cards (%s) to server", cards.stream()
           .map(String::valueOf)
@@ -108,7 +118,9 @@ public class Client {
         sendResponse(ClientMessageType.OK, cards);
       }
       case PRINT -> {
-        LOG.log(Level.INFO, "Server sent: %s", message.getPayload());
+        String payload = message.getPayload().toString();
+        payload = payload.replace(uuid.toString(), "You");
+        LOG.log(Level.INFO, "Server sent: %s", payload);
         sendResponse(ClientMessageType.OK, "Done!");
 
       }
