@@ -12,6 +12,7 @@ import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
 import net.mspreckels.server.yooloo.YoolooGame;
 
+//TODO: create singlesession and tournament session
 public class Session extends Thread {
 
   private static final Logger LOG = new Logger(Session.class);
