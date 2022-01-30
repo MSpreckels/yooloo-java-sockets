@@ -6,30 +6,26 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.mspreckels.client.config.ClientConfig;
-import net.mspreckels.client.enums.ClientState;
 import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
 import net.mspreckels.client.message.ClientMessage;
 import net.mspreckels.client.message.ClientMessageType;
 import net.mspreckels.server.message.ServerMessage;
-import net.mspreckels.enums.AppState;
+import net.mspreckels.client.enums.ClientState;
 
 public class Client {
 
-//  private static Logger LOG = Logger.getLogger("CLIENT_LOGGER");
   private static Logger LOG = new Logger(Client.class);
 
   private final String[] args;
   private final long retryMilliseconds = 5000;
   private final ClientConfig config;
 
-  private AppState appState;
   private ClientState clientState;
 
   private Socket socket;
@@ -40,13 +36,12 @@ public class Client {
   public Client(String[] args, ClientConfig config) {
     this.args = args;
     this.config = config;
-    this.appState = AppState.STARTUP;
-    this.clientState = ClientState.WAITING;
+    this.clientState = ClientState.STARTUP;
     this.cards = new ArrayList<>();
   }
 
   public void start() {
-    while (!appState.equals(AppState.CLOSE)) {
+    while (!clientState.equals(ClientState.CLOSE)) {
       try {
         run();
       } catch (IOException | InterruptedException | ClassNotFoundException e) {
@@ -56,7 +51,7 @@ public class Client {
   }
 
   public void run() throws IOException, InterruptedException, ClassNotFoundException {
-    switch (this.appState) {
+    switch (this.clientState) {
       case STARTUP -> handleStartup();
       case CONNECTING -> handleConnecting();
       case CONNECTED -> handleConnected();
@@ -70,7 +65,7 @@ public class Client {
     cards = IntStream.range(1, 11).boxed().collect(Collectors.toList());
     Collections.shuffle(cards);
 
-    changeState(AppState.CONNECTING);
+    changeState(ClientState.CONNECTING);
   }
 
   private void handleConnecting() throws IOException, InterruptedException {
@@ -83,7 +78,7 @@ public class Client {
       LOG.log(Level.SUCCESS, String.format("Connection successful! Connected to %s",
         this.socket.getRemoteSocketAddress()));
 
-      changeState(AppState.CONNECTED);
+      changeState(ClientState.CONNECTED);
     } catch (ConnectException e) {
       LOG.log(Level.WARNING,
         String.format("Connection couldn't be established. Retry in %s second.",
@@ -93,29 +88,17 @@ public class Client {
   }
 
   private void handleConnected() throws IOException, ClassNotFoundException {
-    switch (clientState) {
-      case REGISTER -> {
-      }
-      case LOGIN -> {
-      }
-      case PLAYING -> {
-      }
-      case WAITING -> {
-        LOG.log(Level.INFO, "Waiting for server to tell me what to do.");
-        ServerMessage message = readInputStream(ServerMessage.class);
+    LOG.log(Level.INFO, "Waiting for server to tell me what to do.");
+    ServerMessage message = readInputStream(ServerMessage.class);
 
-        handleServerMessage(message);
-      }
-      case QUIT -> {
-      }
-    }
+    handleServerMessage(message);
   }
 
   private void handleServerMessage(ServerMessage message) throws IOException {
     switch (message.getType()) {
-      case CHANGE_APPSTATE -> {
+      case SHUTDOWN -> {
         sendResponse(ClientMessageType.OK, "Shutting down!");
-        changeState((AppState) message.getPayload());
+        changeState(ClientState.SHUTDOWN);
       }
       case GET_CARDS -> {
         LOG.log(Level.INFO, "Sending cards (%s) to server", cards.stream()
@@ -143,20 +126,20 @@ public class Client {
 
   private void handleShutdown() {
     LOG.log(Level.WARNING, "Client shutting down. Goodbye!");
-    changeState(AppState.CLOSE);
+    changeState(ClientState.CLOSE);
   }
 
   private <T> T readInputStream(Class<T> clazz) throws IOException, ClassNotFoundException {
     return (T) this.objectInputStream.readObject();
   }
 
-  private void changeState(AppState newState) {
-    LOG.log(Level.INFO, String.format("Changing state from %s to %s", this.appState, newState));
-    this.appState = newState;
+  private void changeState(ClientState newState) {
+    LOG.log(Level.INFO, String.format("Changing state from %s to %s", this.clientState, newState));
+    this.clientState = newState;
   }
 
-  public AppState getAppState() {
-    return this.appState;
+  public ClientState getClientState() {
+    return this.clientState;
   }
 
 

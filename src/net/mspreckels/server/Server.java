@@ -5,7 +5,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import net.mspreckels.enums.AppState;
 import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
 import net.mspreckels.server.config.ServerConfig;
@@ -19,7 +18,6 @@ public class Server {
 
   private final String[] args;
   private final ServerConfig config;
-  private AppState appState;
   private ServerState serverState;
 
   private ServerSocket serverSocket;
@@ -30,13 +28,13 @@ public class Server {
   public Server(String[] args, ServerConfig config) {
     this.args = args;
     serverSocket = null;
-    appState = AppState.STARTUP;
+    serverState = ServerState.STARTUP;
     this.config = config;
     serverClientThreadList = new ArrayList<>();
   }
 
   public void start() {
-    while(!appState.equals(AppState.CLOSE)) {
+    while(!serverState.equals(ServerState.CLOSE)) {
       try {
         run();
       } catch (IOException | InterruptedException | ClassNotFoundException e) {
@@ -51,7 +49,7 @@ public class Server {
    * @throws IOException
    */
   public void run() throws IOException, InterruptedException, ClassNotFoundException {
-    switch (this.appState) {
+    switch (this.serverState) {
       case STARTUP -> handleStartup();
       case ACCEPTING -> handleAccepting();
       case SESSION -> handleSession();
@@ -65,7 +63,7 @@ public class Server {
     //Setup server socket
     this.serverSocket = new ServerSocket(config.getPort());
 
-    changeState(AppState.ACCEPTING);
+    changeState(ServerState.ACCEPTING);
   }
 
   private void handleAccepting() throws IOException, InterruptedException, ClassNotFoundException {
@@ -75,7 +73,7 @@ public class Server {
     handleClient(incomingClient);
 
     if (serverClientThreadList.size() == config.getMaxPlayersInSession()) {
-      changeState(AppState.SESSION);
+      changeState(ServerState.SESSION);
     }
   }
 
@@ -96,21 +94,21 @@ public class Server {
     Session session = new Session(numSessionsCreated++, serverClientThreadList);
     session.start();
     serverClientThreadList.clear();
-    changeState(AppState.ACCEPTING);
+    changeState(ServerState.ACCEPTING);
   }
 
   private void handleShutdown() {
     LOG.log(Level.INFO, "Server shutting down. Goodbye!");
-    changeState(AppState.CLOSE);
+    changeState(ServerState.CLOSE);
   }
 
-  private void changeState(AppState newState) {
-    LOG.log(Level.INFO, String.format("Changing state from %s to %s", this.appState, newState));
-    this.appState = newState;
+  private void changeState(ServerState newState) {
+    LOG.log(Level.INFO, String.format("Changing state from %s to %s", this.serverState, newState));
+    this.serverState = newState;
   }
 
-  public AppState getAppState() {
-    return this.appState;
+  public ServerState getServerState() {
+    return this.serverState;
   }
 
 

@@ -6,7 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
 import java.util.UUID;
-import net.mspreckels.enums.AppState;
+import net.mspreckels.client.enums.ClientState;
 import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
 import net.mspreckels.client.message.ClientMessage;
@@ -47,9 +47,8 @@ public class ServerClientThread extends Thread {
   public void shutdown() throws IOException, ClassNotFoundException {
     LOG.log(Level.INFO, "(%s) Sending shutdown command to %s", uuid, client.getRemoteSocketAddress());
     ServerMessage message = new ServerMessage();
-    message.setDescription("Shutting down .");
-    message.setType(ServerMessageType.CHANGE_APPSTATE);
-    message.setPayload(AppState.SHUTDOWN);
+    message.setDescription("Shutting down.");
+    message.setType(ServerMessageType.SHUTDOWN);
     objectOutputStream.writeObject(message);
 
     //wait for response

@@ -1,7 +1,7 @@
 package net.mspreckels.server.message;
 
 public enum ServerMessageType {
-  CHANGE_APPSTATE,
+  SHUTDOWN,
   GET_CARDS,
   PRINT;
 }
