@@ -95,7 +95,7 @@ public class Session extends Thread {
   }
 
   public void broadcast(String s) {
-    LOG.log(Level.INFO, "(%s) Broadcasting message to all participants: '%s'", sessonId, s);
+    LOG.log(Level.INFO, "(%s) Broadcasting: '%s'", sessonId, s);
 
     clientThreads.forEach(serverClientThread -> {
       try {

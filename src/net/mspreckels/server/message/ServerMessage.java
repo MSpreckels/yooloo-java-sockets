@@ -3,6 +3,7 @@ package net.mspreckels.server.message;
 import java.io.Serializable;
 
 public class ServerMessage implements Serializable {
+
   private String description;
   private ServerMessageType type;
   private Object payload;

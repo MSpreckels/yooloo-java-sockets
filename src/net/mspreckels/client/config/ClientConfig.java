@@ -1,13 +1,12 @@
 package net.mspreckels.client.config;
 
 public class ClientConfig {
+
   private String ip;
   private int port;
 
   /**
-   * Creates a client config.
-   * default ip is "localhost"
-   * default port is 3333
+   * Creates a client config. default ip is "localhost" default port is 3333
    */
   public ClientConfig() {
     this.ip = "localhost";

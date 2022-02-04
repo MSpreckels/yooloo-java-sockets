@@ -12,12 +12,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.mspreckels.client.config.ClientConfig;
-import net.mspreckels.logger.Logger;
-import net.mspreckels.logger.Logger.Level;
+import net.mspreckels.client.enums.ClientState;
 import net.mspreckels.client.message.ClientMessage;
 import net.mspreckels.client.message.ClientMessageType;
+import net.mspreckels.logger.Logger;
+import net.mspreckels.logger.Logger.Level;
 import net.mspreckels.server.message.ServerMessage;
-import net.mspreckels.client.enums.ClientState;
 
 public class Client {
 
@@ -90,7 +90,7 @@ public class Client {
   }
 
   private void handleConnected() throws IOException, ClassNotFoundException {
-    LOG.log(Level.INFO, "Waiting for server to tell me what to do.");
+//    LOG.log(Level.INFO, "Waiting for server to tell me what to do.");
     ServerMessage message = readInputStream(ServerMessage.class);
 
     handleServerMessage(message);

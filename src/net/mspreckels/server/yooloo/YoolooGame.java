@@ -1,15 +1,11 @@
 package net.mspreckels.server.yooloo;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import net.mspreckels.server.threading.ServerClientThread;
 import net.mspreckels.server.threading.Session;
 
 public class YoolooGame {
@@ -33,7 +29,7 @@ public class YoolooGame {
       List<Integer> currentCards = new ArrayList<>();
 
       for (UUID client : session.getClientUUIDs()) {
-        Integer cardOfClient = session.getCardOfClient(client, i);
+        int cardOfClient = session.getCardOfClient(client, i);
         currentCards.add(cardOfClient);
       }
       this.session.broadcast("Played Round " + (i + 1));
@@ -43,20 +39,32 @@ public class YoolooGame {
       UUID roundWinner = session.getClientByCard(bestCard, i);
 
       if (roundWinner == null) {
-        this.session.broadcast("Round " + (i + 1) + " tied!");
+        this.session.broadcast(
+          String.format("Round %s tied! Scoreboard: %s", i + 1, getScoreboard()));
       } else {
-        Integer points = this.points.get(roundWinner);
-        this.points.put(roundWinner, points + (i+1));
+        int points = this.points.get(roundWinner);
+        this.points.put(roundWinner, points + (i + 1));
 
-        this.session.broadcast("Winner of round " + (i + 1) + " is " + roundWinner);
+        this.session.broadcast(
+          String.format("Winner of round %s is %s. Scoreboard: %s", i + 1, roundWinner,
+            getScoreboard()));
       }
 
     }
 
     UUID gameWinner = getWinnerOfGame();
 
-    this.session.broadcast(String.format("Winner of game is %s with %s points!", gameWinner, points.get(gameWinner)));
+    this.session.broadcast(
+      String.format("Winner of game is %s with %s points! Scoreboard: %s", gameWinner,
+        points.get(gameWinner), getScoreboard()));
 
+  }
+
+  private String getScoreboard() {
+    return points.entrySet().stream()
+      .map(uuidIntegerEntry -> String.format("%s: %s", uuidIntegerEntry.getKey(),
+        uuidIntegerEntry.getValue()))
+      .collect(Collectors.joining(", "));
   }
 
   private UUID getWinnerOfGame() {

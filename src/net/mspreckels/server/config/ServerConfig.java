@@ -1,12 +1,12 @@
 package net.mspreckels.server.config;
 
 public class ServerConfig {
+
   private int port;
   private int maxPlayersInSession;
 
   /**
-   * Creates a server config.
-   * default port is 3333
+   * Creates a server config. default port is 3333
    */
   public ServerConfig() {
     this.port = 3333;

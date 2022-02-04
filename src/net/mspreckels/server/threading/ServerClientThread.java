@@ -6,10 +6,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
 import java.util.UUID;
-import net.mspreckels.client.enums.ClientState;
+import net.mspreckels.client.message.ClientMessage;
 import net.mspreckels.logger.Logger;
 import net.mspreckels.logger.Logger.Level;
-import net.mspreckels.client.message.ClientMessage;
 import net.mspreckels.server.message.ServerMessage;
 import net.mspreckels.server.message.ServerMessageType;
 
@@ -32,20 +31,22 @@ public class ServerClientThread extends Thread {
     objectInputStream = new ObjectInputStream(client.getInputStream());
     objectOutputStream.flush();
 
-    LOG.log(Level.INFO, "(%s) Sending print command to %s", uuid, client.getRemoteSocketAddress());
+    LOG.log(Level.INFO, "(%1$s) Sharing uuid %1$s with connected client %2$s", uuid,
+      client.getRemoteSocketAddress());
     ServerMessage message = new ServerMessage();
-    message.setDescription("Testing.");
+    message.setDescription("Telling Identity.");
     message.setType(ServerMessageType.IDENTITY);
     message.setPayload(uuid);
     objectOutputStream.writeObject(message);
 
     //wait for response
     ClientMessage response = readInputStream(ClientMessage.class);
-    LOG.log(Level.INFO, "(%s) Client response: %s %s", uuid, response.getType(), response.getPayload());
+    LOG.log(Level.INFO, "(%s) Client response: %s", uuid, response.getType());
   }
 
   public void shutdown() throws IOException, ClassNotFoundException {
-    LOG.log(Level.INFO, "(%s) Sending shutdown command to %s", uuid, client.getRemoteSocketAddress());
+    LOG.log(Level.INFO, "(%s) Sending shutdown command to %s", uuid,
+      client.getRemoteSocketAddress());
     ServerMessage message = new ServerMessage();
     message.setDescription("Shutting down.");
     message.setType(ServerMessageType.SHUTDOWN);
@@ -53,7 +54,8 @@ public class ServerClientThread extends Thread {
 
     //wait for response
     ClientMessage response = readInputStream(ClientMessage.class);
-    LOG.log(Level.INFO, "(%s) Client response: %s %s", uuid, response.getType(), response.getPayload());
+    LOG.log(Level.INFO, "(%s) Client response: %s %s", uuid, response.getType(),
+      response.getPayload());
 
   }
 
@@ -69,7 +71,8 @@ public class ServerClientThread extends Thread {
     objectOutputStream.writeObject(message);
 
     ClientMessage response = readInputStream(ClientMessage.class);
-    LOG.log(Level.INFO, "(%s) Client response: %s %s", uuid, response.getType(), response.getPayload());
+    LOG.log(Level.INFO, "(%s) Client response: %s %s", uuid, response.getType(),
+      response.getPayload());
 
     return (List<Integer>) response.getPayload();
   }

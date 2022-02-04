@@ -1,7 +1,5 @@
 package net.mspreckels.logger;
 
-import net.mspreckels.client.Client;
-
 public class Logger {
 
   private final String scope;
