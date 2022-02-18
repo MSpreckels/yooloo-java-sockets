@@ -1,16 +1,16 @@
-package net.mspreckels.server.threading;
+package de.mspreckels.server.threading;
 
+import de.mspreckels.client.message.ClientMessage;
+import de.mspreckels.logger.Logger;
+import de.mspreckels.logger.Logger.Level;
+import de.mspreckels.server.message.ServerMessage;
+import de.mspreckels.server.message.ServerMessageType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
 import java.util.UUID;
-import net.mspreckels.client.message.ClientMessage;
-import net.mspreckels.logger.Logger;
-import net.mspreckels.logger.Logger.Level;
-import net.mspreckels.server.message.ServerMessage;
-import net.mspreckels.server.message.ServerMessageType;
 
 public class ServerClientThread extends Thread {
 

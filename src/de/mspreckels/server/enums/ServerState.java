@@ -1,4 +1,4 @@
-package net.mspreckels.server.enums;
+package de.mspreckels.server.enums;
 
 public enum ServerState {
   STARTUP,

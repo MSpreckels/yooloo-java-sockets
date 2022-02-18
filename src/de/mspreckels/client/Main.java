@@ -1,6 +1,6 @@
-package net.mspreckels.client;
+package de.mspreckels.client;
 
-import net.mspreckels.client.config.ClientConfig;
+import de.mspreckels.client.config.ClientConfig;
 
 public class Main {
 

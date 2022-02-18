@@ -1,16 +1,16 @@
-package net.mspreckels.server;
+package de.mspreckels.server;
 
+import de.mspreckels.logger.Logger;
+import de.mspreckels.logger.Logger.Level;
+import de.mspreckels.server.config.ServerConfig;
+import de.mspreckels.server.enums.ServerState;
+import de.mspreckels.server.threading.ServerClientThread;
+import de.mspreckels.server.threading.Session;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import net.mspreckels.logger.Logger;
-import net.mspreckels.logger.Logger.Level;
-import net.mspreckels.server.config.ServerConfig;
-import net.mspreckels.server.enums.ServerState;
-import net.mspreckels.server.threading.ServerClientThread;
-import net.mspreckels.server.threading.Session;
 
 public class Server {
 

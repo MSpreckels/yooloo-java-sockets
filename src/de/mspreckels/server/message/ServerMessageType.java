@@ -1,4 +1,4 @@
-package net.mspreckels.server.message;
+package de.mspreckels.server.message;
 
 public enum ServerMessageType {
   SHUTDOWN,

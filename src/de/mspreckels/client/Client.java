@@ -1,5 +1,12 @@
-package net.mspreckels.client;
+package de.mspreckels.client;
 
+import de.mspreckels.client.config.ClientConfig;
+import de.mspreckels.client.enums.ClientState;
+import de.mspreckels.client.message.ClientMessage;
+import de.mspreckels.client.message.ClientMessageType;
+import de.mspreckels.logger.Logger;
+import de.mspreckels.logger.Logger.Level;
+import de.mspreckels.server.message.ServerMessage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -11,13 +18,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import net.mspreckels.client.config.ClientConfig;
-import net.mspreckels.client.enums.ClientState;
-import net.mspreckels.client.message.ClientMessage;
-import net.mspreckels.client.message.ClientMessageType;
-import net.mspreckels.logger.Logger;
-import net.mspreckels.logger.Logger.Level;
-import net.mspreckels.server.message.ServerMessage;
 
 public class Client {
 

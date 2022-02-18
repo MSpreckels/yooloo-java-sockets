@@ -1,4 +1,4 @@
-package net.mspreckels.client.message;
+package de.mspreckels.client.message;
 
 public enum ClientMessageType {
   OK

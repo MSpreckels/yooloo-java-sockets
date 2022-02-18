@@ -1,4 +1,4 @@
-package net.mspreckels.logger;
+package de.mspreckels.logger;
 
 public class Logger {
 

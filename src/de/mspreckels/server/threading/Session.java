@@ -1,5 +1,8 @@
-package net.mspreckels.server.threading;
+package de.mspreckels.server.threading;
 
+import de.mspreckels.logger.Logger;
+import de.mspreckels.logger.Logger.Level;
+import de.mspreckels.server.yooloo.YoolooGame;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,9 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import net.mspreckels.logger.Logger;
-import net.mspreckels.logger.Logger.Level;
-import net.mspreckels.server.yooloo.YoolooGame;
 
 //TODO: create singlesession and tournament session
 public class Session extends Thread {

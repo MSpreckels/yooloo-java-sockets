@@ -1,12 +1,12 @@
-package net.mspreckels.server.yooloo;
+package de.mspreckels.server.yooloo;
 
+import de.mspreckels.server.threading.Session;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import net.mspreckels.server.threading.Session;
 
 public class YoolooGame {
 

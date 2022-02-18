@@ -1,4 +1,4 @@
-package net.mspreckels.server.config;
+package de.mspreckels.server.config;
 
 public class ServerConfig {
 

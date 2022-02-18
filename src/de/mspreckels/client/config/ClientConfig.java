@@ -1,4 +1,4 @@
-package net.mspreckels.client.config;
+package de.mspreckels.client.config;
 
 public class ClientConfig {
 

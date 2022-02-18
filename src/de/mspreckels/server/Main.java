@@ -1,6 +1,6 @@
-package net.mspreckels.server;
+package de.mspreckels.server;
 
-import net.mspreckels.server.config.ServerConfig;
+import de.mspreckels.server.config.ServerConfig;
 
 public class Main {
 
